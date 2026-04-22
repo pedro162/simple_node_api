@@ -28,7 +28,44 @@ function getById(req, res, next) {
     });
 }
 
+function insert(req, res, next) {
+    const personData = req.body;
+    personModel.insert(personData, (error, createdPerson) => {
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.status(201).json(createdPerson);
+    });
+}
+
+function update(req, res, next) {
+    const id = req.params.id;
+    const personData = req.body;
+    personModel.update(id, personData, (error, updatedPerson) => {
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.json(updatedPerson);
+    });
+}
+
+function remove(req, res, next) {
+    const id = req.params.id;
+    personModel.deleteById(id, (error) => {
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.status(204).send();
+    });
+}
+
 personRouter.get('/', getAll);
 personRouter.get('/:id', getById);
+personRouter.post('/', insert);
+personRouter.put('/:id', update);
+personRouter.delete('/:id', remove);
 
 export default personRouter;
