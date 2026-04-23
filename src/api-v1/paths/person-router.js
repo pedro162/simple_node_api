@@ -1,5 +1,7 @@
 import express from 'express';
 import personModel from '../models/person-model';
+import { validate } from 'jsonschema';
+import { personSchema } from '../schemas/schema.js';
 
 const personRouter = express.Router();
 
@@ -29,6 +31,13 @@ function getById(req, res, next) {
 }
 
 function insert(req, res, next) {
+    const validateResult = validate(req.body, personSchema);
+
+    if (!validateResult.valid) {
+        const errors = validateResult.errors.map(error => error.message);
+        return res.status(400).json({ error: 'Validation failed', details: errors });
+    }
+
     const personData = req.body;
     personModel.insert(personData, (error, createdPerson) => {
         if (error) {
